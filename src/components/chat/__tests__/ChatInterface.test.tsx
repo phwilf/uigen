@@ -60,7 +60,20 @@ afterEach(() => {
   cleanup();
 });
 
-test("renders chat interface with message list and input", () => {
+test("renders chat interface with empty state when no messages", () => {
+  render(<ChatInterface />);
+
+  // Empty state is shown instead of message-list when no messages
+  expect(screen.getByText("Start a conversation to generate React components")).toBeDefined();
+  expect(screen.getByTestId("message-input")).toBeDefined();
+});
+
+test("renders chat interface with message list when messages exist", () => {
+  (useChat as any).mockReturnValue({
+    ...mockUseChat,
+    messages: [{ id: "1", role: "user", content: "Hello" }],
+  });
+
   render(<ChatInterface />);
 
   expect(screen.getByTestId("message-list")).toBeDefined();
@@ -138,6 +151,12 @@ test("isLoading is false when status is idle", () => {
 
 
 test("scrolls when messages change", () => {
+  // Start with messages so ScrollArea is rendered
+  (useChat as any).mockReturnValue({
+    ...mockUseChat,
+    messages: [{ id: "1", role: "user", content: "Hello" }],
+  });
+
   const { rerender } = render(<ChatInterface />);
 
   // Get initial scroll container
@@ -161,6 +180,12 @@ test("scrolls when messages change", () => {
 });
 
 test("renders with correct layout classes", () => {
+  // Start with messages so ScrollArea is rendered
+  (useChat as any).mockReturnValue({
+    ...mockUseChat,
+    messages: [{ id: "1", role: "user", content: "Hello" }],
+  });
+
   const { container } = render(<ChatInterface />);
 
   const mainDiv = container.firstChild as HTMLElement;
